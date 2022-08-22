@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.zerobase'
-version = '0.0.1-SNAPSHOT'
+version = '0.0.2-SNAPSHOT'
 sourceCompatibility = '11'
 
 configurations {
@@ -43,5 +43,5 @@ tasks.named('test') {
 apply plugin:'war'
 
 war {
-    archiveName = 'minesweeper.war'
+    archiveName = 'msv2.war'
 }
