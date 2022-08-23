@@ -35,13 +35,13 @@ public class GameService {
 
     @Transactional
     public GameResponse registerGame(GameRequest request) {
-        int h = request.getHeight(), w = request.getHeight(), m = request.getNumMines();
+        int h = request.getHeight(), w = request.getWidth(), m = request.getNumMines();
         if (h < 8 || h > 80) return GameResponse.builder().errorCode(1).build();
         if (w < 8 || w > 80) return GameResponse.builder().errorCode(2).build();
         if (m < h * w / 10 || m > h * w * 2 / 3) return GameResponse.builder().errorCode(3).build();
         String difficulty = h == 10 && w == 10 && m == 10 ? "Easy"
                           : h == 16 && w == 16 && m == 40 ? "Medium"
-                          : h == 30 && w == 16 && m == 99 ? "Hard" : "Custom";
+                          : h == 16 && w == 30 && m == 99 ? "Hard" : "Custom";
         Integer tmp = h * w * m, score = 0;
         while (tmp > 10) {
             tmp /= 10;
