@@ -22,8 +22,10 @@ import com.zerobase.minesweeper.dto.RankingResponse;
 import com.zerobase.minesweeper.dto.Rank;
 import com.zerobase.minesweeper.entity.Game;
 import com.zerobase.minesweeper.entity.Gamer;
+import com.zerobase.minesweeper.entity.Ranking;
 import com.zerobase.minesweeper.repository.GameRepository;
 import com.zerobase.minesweeper.repository.GamerRepository;
+import com.zerobase.minesweeper.repository.RankingRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,6 +34,7 @@ import lombok.RequiredArgsConstructor;
 public class GameService {
     private final GameRepository gameRepository;
     private final GamerRepository gamerRepository;
+    private final RankingRepository rankingRepository;
 
     @Transactional
     public GameResponse registerGame(GameRequest request) {
@@ -58,6 +61,7 @@ public class GameService {
                         .score(score)
                         .build();
         gameRepository.save(game);
+        updateRanking(game.getGamerId(), difficulty, request.getTimePlayed(), game.getId());
         return GameResponse.builder()
                            .gameId(game.getId())
                            .gamerId(game.getGamerId())
@@ -68,7 +72,33 @@ public class GameService {
     public Gamer createGamer() {
         Gamer gamer = Gamer.builder().build();
         gamerRepository.save(gamer);
+        gamer.setName("anonymous" + String.valueOf(gamer.getId()));
         return gamer;
+    }
+
+    @Transactional
+    public void updateRanking(Long gamerId, String difficulty, Double timePlayed, Long gameId) {
+        Optional<Ranking> optionalRanking = rankingRepository.findByGamerId(gamerId);
+        Ranking ranking = optionalRanking.isEmpty() ? Ranking.builder().build() : optionalRanking.get();
+        if (optionalRanking.isEmpty()) ranking.setGamerId(gamerId);
+        ranking.setGamerName(gamerRepository.findById(gamerId).get().getName());
+        if (difficulty.equals("Easy")) {
+            if (ranking.getEasyTime() == null || timePlayed < ranking.getEasyTime()) {
+                ranking.setEasyId(gameId);
+                ranking.setEasyTime(timePlayed);
+            }
+        } else if (difficulty.equals("Medium")) {
+            if (ranking.getMediumTime() == null || timePlayed < ranking.getMediumTime()) {
+                ranking.setMediumId(gameId);
+                ranking.setMediumTime(timePlayed);
+            }
+        } else if (difficulty.equals("Hard")) {
+            if (ranking.getHardTime() == null || timePlayed < ranking.getHardTime()) {
+                ranking.setHardId(gameId);
+                ranking.setHardTime(timePlayed);
+            }
+        }
+        rankingRepository.save(ranking);
     }
 
     public GetGameResponse getGame(String gameId) {
@@ -122,6 +152,42 @@ public class GameService {
                                 : gamerRepository.findById(gamerId).get().getName());
             response.getContents()
                     .add(new Rank(start + i, names.get(gamerId), timePlayed, gameId, gamerId));
+        }
+        return response;
+    }
+
+    public RankingResponse getGamerRanking(String difficulty, Integer pageIdx, Integer pageSize) {
+        Integer d = difficulty.equals("Hard") ? 2 :
+                    difficulty.equals("Medium") ? 1 : 0;
+        Pageable pageable = PageRequest.of(pageIdx, pageSize,
+                Sort.by(d == 2 ? "hardTime" : d == 1 ? "mediumTime" : "easyTime").ascending());
+        Page<Ranking> page = d == 2 ? rankingRepository.findByHardTimeNotNull(pageable) :
+                             d == 1 ? rankingRepository.findByMediumTimeNotNull(pageable)
+                                    : rankingRepository.findByEasyTimeNotNull(pageable);
+        RankingResponse response = RankingResponse.builder()
+                                                  .difficulty(difficulty)
+                                                  .firstPage(page.isFirst())
+                                                  .lastPage(page.isLast())
+                                                  .numberOfElements(page.getNumberOfElements())
+                                                  .totalElements(page.getTotalElements())
+                                                  .contents(new ArrayList<>())
+                                                  .build();
+        Integer numItems = page.getNumberOfElements();
+        Long start = page.getPageable().getOffset() + 1;
+        for (int i = 0; i < numItems; i++) {
+            Double[] times = new Double[] { page.getContent().get(i).getEasyTime(),
+                                            page.getContent().get(i).getMediumTime(),
+                                            page.getContent().get(i).getHardTime() };
+            Long[] ids = new Long[] { page.getContent().get(i).getEasyId(),
+                                      page.getContent().get(i).getMediumId(),
+                                      page.getContent().get(i).getHardId() };
+            response.getContents().add(Rank.builder()
+                                           .ranking(start + i)
+                                           .name(page.getContent().get(i).getGamerName())
+                                           .time(times[d])
+                                           .gameId(ids[d])
+                                           .gamerId(page.getContent().get(i).getGamerId())
+                                           .build());
         }
         return response;
     }

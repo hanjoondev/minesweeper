@@ -46,4 +46,12 @@ public class GameController {
             @RequestParam Integer pageSize) {
         return gameService.getRanking(difficulty, pageIdx, pageSize);
     }
+
+    @GetMapping(value = "game/gamer-ranking", produces = "application/json")
+    public RankingResponse getGamerRanking(
+            @RequestParam String difficulty,
+            @RequestParam Integer pageIdx,
+            @RequestParam Integer pageSize) {
+        return gameService.getGamerRanking(difficulty, pageIdx, pageSize);
+    }
 }
