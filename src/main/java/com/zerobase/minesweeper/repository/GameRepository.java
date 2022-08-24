@@ -11,4 +11,5 @@ import com.zerobase.minesweeper.entity.Game;
 public interface GameRepository extends PagingAndSortingRepository<Game, Long> {
     List<Game> findFirst10ByGamerIdOrderByCreatedAtDesc(Long gamerId);
     Page<Game> findByDifficulty(String difficulty, Pageable pageable);
+    Long countByGamerId(Long gamerId);
 }

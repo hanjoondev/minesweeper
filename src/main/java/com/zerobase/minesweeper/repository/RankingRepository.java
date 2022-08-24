@@ -13,4 +13,7 @@ public interface RankingRepository extends PagingAndSortingRepository<Ranking, L
     Page<Ranking> findByEasyTimeNotNull(Pageable pageable);
     Page<Ranking> findByMediumTimeNotNull(Pageable pageable);
     Page<Ranking> findByHardTimeNotNull(Pageable pageable);
+    Long countByEasyTimeLessThan(Double easyTIme);
+    Long countByMediumTimeLessThan(Double mediumTime);
+    Long countByHardTimeLessThan(Double hardTime);
 }
