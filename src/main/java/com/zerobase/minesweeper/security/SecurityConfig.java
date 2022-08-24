@@ -45,8 +45,7 @@ public class SecurityConfig {
 
     @Bean
     CorsFilter corsFilter() {
-        CorsFilter filter = new CorsFilter();
-        return filter;
+        return new CorsFilter();
     }
 
     @Bean
@@ -76,7 +75,7 @@ public class SecurityConfig {
 
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                    .antMatchers("/auth/**")
+                    .antMatchers("/", "/auth/**")
                     .permitAll()
                 /*  로그인 인증 필요없는 url 설정
                 * */

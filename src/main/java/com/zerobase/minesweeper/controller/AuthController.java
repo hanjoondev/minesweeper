@@ -5,6 +5,7 @@ import com.zerobase.minesweeper.dto.TokenDto;
 import com.zerobase.minesweeper.dto.TokensRequest;
 import com.zerobase.minesweeper.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -33,6 +34,7 @@ public class AuthController {
     * */
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@Valid @RequestBody TokensRequest request) {
-        return ResponseEntity.ok(authService.logout(request));
+        authService.logout(request);
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 }
