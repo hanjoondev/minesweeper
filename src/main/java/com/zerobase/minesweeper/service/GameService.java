@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import com.zerobase.minesweeper.dto.GameRequest;
 import com.zerobase.minesweeper.dto.GameResponse;
+import com.zerobase.minesweeper.dto.GamerStatResponse;
 import com.zerobase.minesweeper.dto.GetGameListResponse;
 import com.zerobase.minesweeper.dto.GetGameResponse;
 import com.zerobase.minesweeper.dto.RankingResponse;
@@ -42,6 +43,8 @@ public class GameService {
         if (h < 8 || h > 80) return GameResponse.builder().errorCode(1).build();
         if (w < 8 || w > 80) return GameResponse.builder().errorCode(2).build();
         if (m < h * w / 10 || m > h * w * 2 / 3) return GameResponse.builder().errorCode(3).build();
+        if (request.getGamerId() > 0 && gamerRepository.findById(request.getGamerId()).isEmpty())
+            return GameResponse.builder().errorCode(4).build();
         String difficulty = h == 10 && w == 10 && m == 10 ? "Easy"
                           : h == 16 && w == 16 && m == 40 ? "Medium"
                           : h == 16 && w == 30 && m == 99 ? "Hard" : "Custom";
@@ -190,5 +193,26 @@ public class GameService {
                                            .build());
         }
         return response;
+    }
+
+    public GamerStatResponse getGamerStat(String gamerId) {
+        Long id = Long.valueOf(gamerId);
+        Optional<Ranking> optionalGamer = rankingRepository.findByGamerId(id);
+        if (optionalGamer.isEmpty()) return GamerStatResponse.builder()
+                                                             .gamerId(id)
+                                                             .errorCode(1)
+                                                             .build();
+        Ranking r = optionalGamer.get();
+        Double e = r.getEasyTime(), m = r.getMediumTime(), h = r.getHardTime();
+        return GamerStatResponse.builder()
+                .gamerId(id)
+                .clearCount(gameRepository.countByGamerId(id))
+                .easyRank(e != null ? rankingRepository.countByEasyTimeLessThan(e) + 1 : null)
+                .mediumRank(m != null ? rankingRepository.countByMediumTimeLessThan(m) + 1 : null)
+                .hardRank(h != null ? rankingRepository.countByHardTimeLessThan(h) + 1 : null)
+                .easyTime(e)
+                .mediumTime(m)
+                .hardTime(h)
+                .build();
     }
 }
