@@ -11,7 +11,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class GamerStatResponse {
     Long gamerId;
-    Long clearCount;
+    Long easyCleared;
+    Long mediumCleared;
+    Long hardCleared;
     Long easyRank;
     Long mediumRank;
     Long hardRank;
