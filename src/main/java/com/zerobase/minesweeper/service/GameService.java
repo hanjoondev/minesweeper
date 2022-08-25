@@ -206,7 +206,9 @@ public class GameService {
         Double e = r.getEasyTime(), m = r.getMediumTime(), h = r.getHardTime();
         return GamerStatResponse.builder()
                 .gamerId(id)
-                .clearCount(gameRepository.countByGamerId(id))
+                .easyCleared(gameRepository.countByGamerIdAndDifficulty(id, "Easy"))
+                .mediumCleared(gameRepository.countByGamerIdAndDifficulty(id, "Medium"))
+                .hardCleared(gameRepository.countByGamerIdAndDifficulty(id, "Hard"))
                 .easyRank(e != null ? rankingRepository.countByEasyTimeLessThan(e) + 1 : null)
                 .mediumRank(m != null ? rankingRepository.countByMediumTimeLessThan(m) + 1 : null)
                 .hardRank(h != null ? rankingRepository.countByHardTimeLessThan(h) + 1 : null)
