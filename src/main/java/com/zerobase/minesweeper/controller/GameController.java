@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.zerobase.minesweeper.dto.GameRequest;
 import com.zerobase.minesweeper.dto.GameResponse;
+import com.zerobase.minesweeper.dto.GamerStatResponse;
 import com.zerobase.minesweeper.dto.GetGameListResponse;
 import com.zerobase.minesweeper.dto.GetGameResponse;
 import com.zerobase.minesweeper.dto.RankingResponse;
@@ -33,7 +34,6 @@ public class GameController {
         return gameService.getGame(gameId);
     }
 
-
     @GetMapping(value = "game/list/{gamerId}", produces = "application/json")
     public GetGameListResponse getGameList(@PathVariable String gamerId) {
         return gameService.getGameList(gamerId);
@@ -54,4 +54,10 @@ public class GameController {
             @RequestParam Integer pageSize) {
         return gameService.getGamerRanking(difficulty, pageIdx, pageSize);
     }
+
+    @GetMapping(value = "game/stat/{gamerId}", produces = "application/json")
+    public GamerStatResponse getGamerStat(@PathVariable String gamerId) {
+        return gameService.getGamerStat(gamerId);
+    }
+
 }
