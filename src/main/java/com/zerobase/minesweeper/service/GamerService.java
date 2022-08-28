@@ -1,6 +1,7 @@
 package com.zerobase.minesweeper.service;
 
 import com.zerobase.minesweeper.component.MailComponent;
+import com.zerobase.minesweeper.dto.GamerDto;
 import com.zerobase.minesweeper.entity.Gamer;
 import com.zerobase.minesweeper.exception.GamerException;
 import com.zerobase.minesweeper.repository.GamerRepository;
@@ -11,7 +12,9 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -42,6 +45,7 @@ public class GamerService {
                 .mail(email)
                 .authCode(encValidationKey)
                 .isVerified(false)
+                .isSuspend(false)
                 .role(Role.ROLE_USER).build());
 
         sendValidationKey(email, validationKey);
@@ -103,7 +107,7 @@ public class GamerService {
     }
 
     @Transactional
-    public void updateGamerInfo(String email, String name) {
+    public void updateGamerName(String email, String name) {
 
         Gamer gamer = gamerRepository.findByMail(email).orElseThrow(() -> new GamerException(ErrorCode.USER_NOT_FOUND));
 
@@ -113,7 +117,7 @@ public class GamerService {
     }
 
     @Transactional
-    public void deleteGamer(String email, String password) {
+    public void withdrawalGamer(String email, String password) {
 
         Gamer gamer = gamerRepository.findByMail(email).orElseThrow(() -> new GamerException(ErrorCode.USER_NOT_FOUND));
 
@@ -127,5 +131,94 @@ public class GamerService {
         }
 
     }
+
+    @Transactional
+    public List<GamerDto> getGamers() {
+
+        List<Gamer> gamers = gamerRepository.findAll();
+
+        return gamers.stream()
+                .filter(gamer -> gamer.getRole().equals(Role.ROLE_USER))
+                .map(gamer -> GamerDto.builder()
+                        .id(gamer.getId())
+                        .name(gamer.getName())
+                        .mail(gamer.getMail())
+                        .isVerified(gamer.isVerified())
+                        .isSuspend(gamer.isSuspend())
+                        .regDt(gamer.getRegDt())
+                        .verifiedDt(gamer.getVerifiedDt())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public GamerDto getGamerInfo(Long gamerId) {
+
+        Gamer gamer = gamerRepository.findById(gamerId).orElseThrow(() -> new GamerException(ErrorCode.USER_NOT_FOUND));
+
+        return GamerDto.builder()
+                .id(gamer.getId())
+                .name(gamer.getName())
+                .mail(gamer.getMail())
+                .isVerified(gamer.isVerified())
+                .isSuspend(gamer.isSuspend())
+                .regDt(gamer.getRegDt())
+                .verifiedDt(gamer.getVerifiedDt())
+                .build();
+    }
+
+    @Transactional
+    public void deleteGamer(Long gamerId) {
+
+        Gamer gamer = gamerRepository.findById(gamerId).orElseThrow(() -> new GamerException(ErrorCode.USER_NOT_FOUND));
+
+        gamerRepository.delete(gamer);
+
+    }
+
+    @Transactional
+    public void suspendGamer(Long gamerId, boolean suspend) {
+
+        Gamer gamer = gamerRepository.findById(gamerId).orElseThrow(() -> new GamerException(ErrorCode.USER_NOT_FOUND));
+
+        gamer.setSuspend(suspend);
+
+        gamerRepository.save(gamer);
+
+    }
+
+    /*@Transactional
+    public void updateGamerPassword(String email, String oldPassword, String newPassword) {
+
+        Gamer gamer = gamerRepository.findByMail(email).orElseThrow(() -> new GamerException(ErrorCode.USER_NOT_FOUND));
+
+        if (BCrypt.checkpw(oldPassword, gamer.getPswd())) {
+
+            gamer.setPswd(BCrypt.hashpw(newPassword, BCrypt.gensalt()));
+            gamerRepository.save(gamer);
+
+        } else {
+
+            throw new GamerException(ErrorCode.PASSWORD_MIS_MATCH);
+        }
+    }*/
+
+    /*@Transactional
+    public void lostGamerPassword(String email) {
+
+        Gamer gamer = gamerRepository.findByMail(email).orElseThrow(() -> new GamerException(ErrorCode.USER_NOT_FOUND));
+
+        gamer.setPswd(BCrypt.hashpw(newPassword, BCrypt.gensalt()));
+        gamerRepository.save(gamer);
+
+        if (BCrypt.checkpw(oldPassword, gamer.getPswd())) {
+
+
+
+        } else {
+
+            throw new GamerException(ErrorCode.PASSWORD_MIS_MATCH);
+        }
+    }*/
 }
 
