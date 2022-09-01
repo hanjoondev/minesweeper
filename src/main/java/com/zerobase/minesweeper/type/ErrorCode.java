@@ -8,6 +8,8 @@ import lombok.Getter;
 public enum ErrorCode {
 
     USER_NOT_FOUND("사용자가 없습니다."),
+    GAME_NOT_FOUND("게임 데이터가 없습니다."),
+    USER_HAS_BEEN_BANNED("사용자가 정지되었습니다."),
     NOT_AUTHENTICATED_EMAIL("이메일 인증이 되지 않은 사용자입니다."),
     USER_ALREADY_VALIDATED("이미 이메일 인증이 된 사용자 입니다."),
     VALIDATION_KEY_MIS_MATCH("올바르지 않은 인증키 입니다."),
