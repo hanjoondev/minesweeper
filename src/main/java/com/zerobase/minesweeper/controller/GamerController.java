@@ -64,18 +64,18 @@ public class GamerController {
     }
 
     //비밀번호 변경
-    /*@PatchMapping("/gamer/password")
+    @PatchMapping("/gamer/password")
     public ResponseEntity<?> updateGamerPassword(@RequestBody @Valid GamerUpdatePasswordRequest request) {
         gamerService.updateGamerPassword(request.getEmail(), request.getOldPassword(), request.getNewPassword());
         return ResponseEntity.ok(HttpStatus.OK);
-    }*/
+    }
 
     //비밀번호 찾기(찾기를 요청할 경우, 무작위로 생성된 비밀번호를 사용자 이메일로 보내줌)
-    /*@PostMapping("/gamer/password")
+    @PostMapping("/gamer/password")
     public ResponseEntity<?> lostGamerPassword(@RequestBody @Valid GamerLostPasswordRequest request) {
         gamerService.lostGamerPassword(request.getEmail());
         return ResponseEntity.ok(HttpStatus.OK);
-    }*/
+    }
 
     /*
     관리자 페이지 용

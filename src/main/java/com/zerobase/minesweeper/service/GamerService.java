@@ -206,7 +206,7 @@ public class GamerService {
                 .collect(Collectors.toList());
     }
 
-    /*@Transactional
+    @Transactional
     public void updateGamerPassword(String email, String oldPassword, String newPassword) {
 
         Gamer gamer = gamerRepository.findByMail(email).orElseThrow(() -> new GamerException(ErrorCode.USER_NOT_FOUND));
@@ -220,24 +220,35 @@ public class GamerService {
 
             throw new GamerException(ErrorCode.PASSWORD_MIS_MATCH);
         }
-    }*/
+    }
 
-    /*@Transactional
+    @Transactional
     public void lostGamerPassword(String email) {
 
         Gamer gamer = gamerRepository.findByMail(email).orElseThrow(() -> new GamerException(ErrorCode.USER_NOT_FOUND));
 
-        gamer.setPswd(BCrypt.hashpw(newPassword, BCrypt.gensalt()));
+        String password = generateRandomPassword();
+        gamer.setPswd(BCrypt.hashpw(password, BCrypt.gensalt()));
         gamerRepository.save(gamer);
 
-        if (BCrypt.checkpw(oldPassword, gamer.getPswd())) {
+        sendRandomPassword(email, password);
 
+    }
 
+    private String generateRandomPassword() {
+        return String.valueOf(ThreadLocalRandom.current().nextInt(10000000, 100000000));
+    }
 
-        } else {
-
-            throw new GamerException(ErrorCode.PASSWORD_MIS_MATCH);
-        }
-    }*/
+    private boolean sendRandomPassword(String email, String randomPassword) {
+        String subject = randomPassword + "는 회원님의 임시 비밀번호 입니다. Minesweeper";
+        String text = "<p>안녕하세요 Minesweeper 입니다.<p>" +
+                "<p>회원님의 임시 비밀번호는</p>" +
+                "<h2>" + randomPassword + "</h2>" +
+                "<p>입니다.</p>" +
+                "<p>임시 비밀번호를 사용하여 로그인 하신 후, 비밀번호를 변경해 주세요</p>" +
+                "<p>감사합니다</p>" +
+                "<div><a target='_blank' href='???'> Minesweeper 로 이동하기 </a></div>";
+        return mailComponent.sendMail(email, subject, text);
+    }
 }
 
