@@ -94,6 +94,7 @@ public class GamerController {
                 .collect(Collectors.toList()));
     }
 
+    //특정 회원 보기
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/gamer/{gamerId}")
     public ResponseEntity<GamerInfoResponse> getGamerInfo(@PathVariable("gamerId") @NotBlank Long gamerId) {
@@ -125,6 +126,21 @@ public class GamerController {
                                           @PathVariable("suspend") @NotBlank boolean suspend) {
         gamerService.suspendGamer(gamerId, suspend);
         return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    //회원 검색
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/gamer/search")
+    public ResponseEntity<List<GamersBoardInfoResponse>> searchGamers(
+            @RequestParam String keyword
+    ) {
+        return ResponseEntity.ok(gamerService.searchGamers(keyword).stream()
+                .map(gamerDto -> GamersBoardInfoResponse.builder()
+                        .id(gamerDto.getId())
+                        .name(gamerDto.getName())
+                        .regDt(gamerDto.getRegDt().toLocalDate())
+                        .build())
+                .collect(Collectors.toList()));
     }
 
 }

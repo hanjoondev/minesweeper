@@ -187,6 +187,25 @@ public class GamerService {
 
     }
 
+    @Transactional
+    public List<GamerDto> searchGamers(String keyword) {
+
+        List<Gamer> gamers = gamerRepository.findByNameAndMailContains(keyword);
+
+        return gamers.stream()
+                .filter(gamer -> gamer.getRole().equals(Role.ROLE_USER))
+                .map(gamer -> GamerDto.builder()
+                        .id(gamer.getId())
+                        .name(gamer.getName())
+                        .mail(gamer.getMail())
+                        .isVerified(gamer.isVerified())
+                        .isSuspend(gamer.isSuspend())
+                        .regDt(gamer.getRegDt())
+                        .verifiedDt(gamer.getVerifiedDt())
+                        .build())
+                .collect(Collectors.toList());
+    }
+
     /*@Transactional
     public void updateGamerPassword(String email, String oldPassword, String newPassword) {
 
