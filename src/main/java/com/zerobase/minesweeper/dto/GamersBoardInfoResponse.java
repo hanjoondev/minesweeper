@@ -12,5 +12,6 @@ import java.time.LocalDate;
 public class GamersBoardInfoResponse {
     private Long id;
     private String name;
+    private String mail;
     private LocalDate regDt;
 }
