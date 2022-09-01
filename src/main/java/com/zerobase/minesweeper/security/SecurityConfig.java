@@ -25,6 +25,8 @@ public class SecurityConfig {
     private final JwtAuthenticationEntryPoint authenticationEntryPoint;
     private static final String[] PERMITTED = {
         "/h2-console/**",
+        "/gamer/**",
+        "/game/**",
         "/v3/api-docs/**",
         "/swagger*/**",
         "/favicon.ico"
@@ -67,10 +69,8 @@ public class SecurityConfig {
 
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                    .antMatchers("/auth/**",
-                            "/stomp/**",
-                            "/gamer/**",
-                            "/game/**")
+                    .antMatchers("/", "/auth/**",
+                            "/stomp/**")
                     .permitAll()
                 /*  로그인 인증 필요없는 url 설정
                 * */
