@@ -54,7 +54,7 @@ public class TokenProvider {
                 .signWith(SECRET_KEY)
                 .compact();
 
-        return new TokenDto(BEARER_TYPE, accessToken, refreshToken, Long.parseLong(authentication.getName()));
+        return new TokenDto(BEARER_TYPE, accessToken, refreshToken);
     }
 
     public Authentication getAuthentication(String accessToken) {
