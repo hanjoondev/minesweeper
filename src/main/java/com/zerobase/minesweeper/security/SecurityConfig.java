@@ -13,7 +13,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.session.SessionManagementFilter;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -26,8 +25,6 @@ public class SecurityConfig {
     private final JwtAuthenticationEntryPoint authenticationEntryPoint;
     private static final String[] PERMITTED = {
         "/h2-console/**",
-        "/gamer/**",
-        "/game/**",
         "/v3/api-docs/**",
         "/swagger*/**",
         "/favicon.ico"
@@ -44,14 +41,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    CorsFilter corsFilter() {
-        CorsFilter filter = new CorsFilter();
-        return filter;
-    }
-
-    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http    .addFilterBefore(corsFilter(), SessionManagementFilter.class)
+        http
                 .httpBasic().disable()
                 .csrf().disable()
                 .sessionManagement()
@@ -76,7 +67,10 @@ public class SecurityConfig {
 
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                    .antMatchers("/auth/**")
+                    .antMatchers("/auth/**",
+                            "/stomp/**",
+                            "/gamer/**",
+                            "/game/**")
                     .permitAll()
                 /*  로그인 인증 필요없는 url 설정
                 * */
@@ -88,6 +82,5 @@ public class SecurityConfig {
 
         return http.build();
     }
-
 
 }

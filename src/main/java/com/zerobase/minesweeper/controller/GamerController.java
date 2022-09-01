@@ -3,6 +3,8 @@ package com.zerobase.minesweeper.controller;
 import com.zerobase.minesweeper.dto.*;
 import com.zerobase.minesweeper.service.GamerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -25,32 +27,37 @@ public class GamerController {
 
     //회원 가입
     @PostMapping("/gamer")
-    public boolean gamerSignUp(@RequestBody @Valid GamerSignInRequest request) {
-        return gamerService.gamerSignUp(request.getEmail(), request.getName(), request.getPassword());
+    public ResponseEntity<?> gamerSignUp(@RequestBody @Valid GamerSignInRequest request) {
+        gamerService.gamerSignUp(request.getEmail(), request.getName(), request.getPassword());
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
     //회원 활성화
     @PostMapping("/gamer/validation")
-    public boolean gamerActivation(@RequestBody @Valid GamerActivationRequest request) {
-        return gamerService.gamerActivation(request.getEmail(), request.getValidationKey());
+    public ResponseEntity<?> gamerActivation(@RequestBody @Valid GamerActivationRequest request) {
+        gamerService.gamerActivation(request.getEmail(), request.getValidationKey());
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
     //인증번호 재발급
     @PatchMapping("/gamer/validation")
-    public boolean reissueValidationKey(@RequestBody @Valid GamerReissueValidationKeyRequest request) {
-        return gamerService.reissueValidationKey(request.getEmail());
+    public ResponseEntity<?> reissueValidationKey(@RequestBody @Valid GamerReissueValidationKeyRequest request) {
+        gamerService.reissueValidationKey(request.getEmail());
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
     //회원정보 수정
     @PatchMapping("/gamer")
-    public boolean updateGamerInfo(@RequestBody @Valid GamerUpdateInfoRequest request){
-        return gamerService.updateGamerInfo(request.getEmail(), request.getName());
+    public ResponseEntity<?> updateGamerInfo(@RequestBody @Valid GamerUpdateInfoRequest request){
+        gamerService.updateGamerInfo(request.getEmail(), request.getName());
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
     //회원 탈퇴
     @DeleteMapping("/gamer")
-    public boolean deleteGamer(@RequestBody @Valid GamerDeleteRequest request) {
-        return gamerService.deleteGamer(request.getEmail(), request.getPassword());
+    public ResponseEntity<?> deleteGamer(@RequestBody @Valid GamerDeleteRequest request) {
+        gamerService.deleteGamer(request.getEmail(), request.getPassword());
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
 }
