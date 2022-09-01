@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class LoginResponse {
-    private TokenDto tokenDto;
+    private TokenDto token;
     private Long gamerId;
     private String gamerName;
 }
