@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(GamerException.class)
     public ErrorResponse handleGamerException(GamerException e) {
         return new ErrorResponse(e.getErrorCode(), e.getErrorMessage());
@@ -19,11 +18,4 @@ public class GlobalExceptionHandler {
     public ErrorResponse handelJwtException(JwtException e) {
         return new ErrorResponse(e.getErrorCode(), e.getMessage());
     }
-
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(GameException.class)
-    public ErrorResponse handleGameException(GameException e) {
-        return new ErrorResponse(e.getErrorCode(), e.getErrorMessage());
-    }
-
 }
