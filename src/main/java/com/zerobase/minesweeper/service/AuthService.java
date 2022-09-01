@@ -1,5 +1,6 @@
 package com.zerobase.minesweeper.service;
 
+import com.zerobase.minesweeper.dto.LoginResponse;
 import com.zerobase.minesweeper.dto.TokenDto;
 import com.zerobase.minesweeper.dto.TokensRequest;
 import com.zerobase.minesweeper.entity.Gamer;
@@ -54,7 +55,7 @@ public class AuthService implements UserDetailsService {
      *   토큰발급
      * */
     @Transactional
-    public TokenDto login(String email, String password) {
+    public LoginResponse login(String email, String password) {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
 
         Authentication authentication = getAuthentication(authenticationToken);
@@ -62,8 +63,11 @@ public class AuthService implements UserDetailsService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         TokenDto tokenDto = tokenProvider.generateToken(authentication);
 
+        Gamer gamer = gamerRepository.findById(Long.valueOf(authentication.getName()))
+                .orElseThrow(() -> new GamerException(ErrorCode.USER_NOT_FOUND));
+
         refreshTokenRepository.save(new RefreshToken(Long.parseLong(authentication.getName()), tokenDto.getRefreshToken()));
-        return tokenDto;
+        return new LoginResponse(tokenDto, gamer.getId(), gamer.getName());
     }
 
     private Authentication getAuthentication(UsernamePasswordAuthenticationToken authenticationToken) {

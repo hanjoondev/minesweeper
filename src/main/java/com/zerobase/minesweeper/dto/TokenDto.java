@@ -1,11 +1,12 @@
 package com.zerobase.minesweeper.dto;
 
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
 public class TokenDto {
-    private final String bearerType;
-    private final String accessToken;
-    private final String refreshToken;
-    private final Long gamerId;
+    private String bearerType;
+    private String accessToken;
+    private String refreshToken;
 }
