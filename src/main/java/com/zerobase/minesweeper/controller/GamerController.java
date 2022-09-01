@@ -130,7 +130,7 @@ public class GamerController {
     }
 
     //회원 검색
-    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/gamer/search")
     public ResponseEntity<List<GamersBoardInfoResponse>> searchGamers(
             @RequestParam String keyword

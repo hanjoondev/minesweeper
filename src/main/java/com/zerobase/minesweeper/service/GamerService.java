@@ -190,7 +190,7 @@ public class GamerService {
     @Transactional
     public List<GamerDto> searchGamers(String keyword) {
 
-        List<Gamer> gamers = gamerRepository.findByNameAndMailContains(keyword);
+        List<Gamer> gamers = gamerRepository.findByNameOrMailContains(keyword, keyword);
 
         return gamers.stream()
                 .filter(gamer -> gamer.getRole().equals(Role.ROLE_USER))
@@ -204,6 +204,7 @@ public class GamerService {
                         .verifiedDt(gamer.getVerifiedDt())
                         .build())
                 .collect(Collectors.toList());
+
     }
 
     @Transactional

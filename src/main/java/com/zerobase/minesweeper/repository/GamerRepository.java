@@ -11,6 +11,6 @@ import java.util.Optional;
 public interface GamerRepository extends JpaRepository<Gamer, Long> {
     boolean existsByMail(String mail);
     Optional<Gamer> findByMail(String mail);
-    List<Gamer> findByNameAndMailContains(String keyword);
+    List<Gamer> findByNameOrMailContains(String name, String mail);
 
 }
