@@ -1,18 +1,13 @@
 package com.zerobase.minesweeper.service;
 
-import com.zerobase.minesweeper.dto.LoginResponse;
 import com.zerobase.minesweeper.dto.TokenDto;
 import com.zerobase.minesweeper.dto.TokensRequest;
 import com.zerobase.minesweeper.entity.Gamer;
 import com.zerobase.minesweeper.entity.RefreshToken;
-import com.zerobase.minesweeper.exception.GamerException;
-import com.zerobase.minesweeper.exception.JwtException;
 import com.zerobase.minesweeper.repository.GamerRepository;
 import com.zerobase.minesweeper.repository.RefreshTokenRepository;
 import com.zerobase.minesweeper.security.TokenProvider;
-import com.zerobase.minesweeper.type.ErrorCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -40,10 +35,10 @@ public class AuthService implements UserDetailsService {
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Gamer gamer = gamerRepository.findByMail(username)
-                .orElseThrow(() -> new GamerException(ErrorCode.USER_NOT_FOUND));
+                .orElseThrow(() -> new RuntimeException("읎는 아이디 입네다."));
 
         if (!gamer.isVerified()) {
-            throw new GamerException(ErrorCode.NOT_AUTHENTICATED_EMAIL);
+            throw new RuntimeException("이메일 인증이 되지 않은 사용자입니다.");
         }
 
         return new User(gamer.getId().toString(), gamer.getPswd(),
@@ -54,44 +49,32 @@ public class AuthService implements UserDetailsService {
      *   db에서 멤버 확인
      *   토큰발급
      * */
-    @Transactional
-    public LoginResponse login(String email, String password) {
+    public TokenDto login(String email, String password) {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
 
-        Authentication authentication = getAuthentication(authenticationToken);
+        Authentication authentication = authenticationManagerBuilder.getObject()
+                                        .authenticate(authenticationToken);// authenticate 호출 시 -> loadUserByUsername 실행
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         TokenDto tokenDto = tokenProvider.generateToken(authentication);
 
-        Gamer gamer = gamerRepository.findById(Long.valueOf(authentication.getName()))
-                .orElseThrow(() -> new GamerException(ErrorCode.USER_NOT_FOUND));
-
         refreshTokenRepository.save(new RefreshToken(Long.parseLong(authentication.getName()), tokenDto.getRefreshToken()));
-        return new LoginResponse(tokenDto, gamer.getId(), gamer.getName());
-    }
-
-    private Authentication getAuthentication(UsernamePasswordAuthenticationToken authenticationToken) {
-        try { // authenticate 호출 시 -> loadUserByUsername 실행
-            return authenticationManagerBuilder.getObject()
-                    .authenticate(authenticationToken);
-        } catch (BadCredentialsException e) {
-            throw new GamerException(ErrorCode.INVALID_LOGIN_INFO);
-        }
+        return tokenDto;
     }
 
     @Transactional
     public TokenDto reissue(TokensRequest request) {
         if (!tokenProvider.validateToken(request.getRefreshToken())) {
-            throw new JwtException(ErrorCode.INVALID_REFRESH_TOKEN);
+            throw new RuntimeException("refresh token이 만료되었습니다. 재로그인이 필요합니다.");
         }
 
         Authentication authentication = tokenProvider.getAuthentication(request.getAccessToken());
 
         RefreshToken refreshToken = refreshTokenRepository.findByGamerId(Long.valueOf(authentication.getName()))
-                .orElseThrow(() -> new JwtException(ErrorCode.NOT_FOUND_USER_TOKEN));
+                .orElseThrow(() -> new RuntimeException("로그아웃된 사용자입니다."));
 
         if (!refreshToken.getToken().equals(request.getRefreshToken())) {
-            throw new JwtException(ErrorCode.MIS_MATCH_TOKEN);
+            throw new RuntimeException("토큰의 유저 정보가 일치하지 않습니다.");
         }
 
         TokenDto tokenDto = tokenProvider.generateToken(authentication);
@@ -101,13 +84,13 @@ public class AuthService implements UserDetailsService {
         return tokenDto;
     }
 
-    @Transactional
-    public void logout(TokensRequest request) {
+    public boolean logout(TokensRequest request) {
         Authentication authentication = tokenProvider.getAuthentication(request.getAccessToken());
 
         RefreshToken refreshToken = refreshTokenRepository.findByGamerId(Long.valueOf(authentication.getName()))
-                .orElseThrow(() -> new JwtException(ErrorCode.NOT_FOUND_USER_TOKEN));
+                .orElseThrow(() -> new RuntimeException("저장된 토큰 값을 찾을 수 없습니다."));
 
         refreshTokenRepository.delete(refreshToken);
+        return true;
     }
 }
