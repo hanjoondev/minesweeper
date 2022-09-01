@@ -89,6 +89,7 @@ public class GamerController {
                 .map(gamerDto -> GamersBoardInfoResponse.builder()
                         .id(gamerDto.getId())
                         .name(gamerDto.getName())
+                        .mail(gamerDto.getMail())
                         .regDt(gamerDto.getRegDt().toLocalDate())
                         .build())
                 .collect(Collectors.toList()));
