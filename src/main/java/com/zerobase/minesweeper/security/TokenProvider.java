@@ -1,8 +1,6 @@
 package com.zerobase.minesweeper.security;
 
 import com.zerobase.minesweeper.dto.TokenDto;
-import com.zerobase.minesweeper.exception.JwtException;
-import com.zerobase.minesweeper.type.ErrorCode;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -54,14 +52,14 @@ public class TokenProvider {
                 .signWith(SECRET_KEY)
                 .compact();
 
-        return new TokenDto(BEARER_TYPE, accessToken, refreshToken);
+        return new TokenDto(BEARER_TYPE, accessToken, refreshToken, Long.parseLong(authentication.getName()));
     }
 
     public Authentication getAuthentication(String accessToken) {
         Claims claims = parseClaims(accessToken);
 
         if (ObjectUtils.isEmpty(claims.get(KEY_ROLES))) {
-            throw new JwtException(ErrorCode.INVALID_TOKEN);
+            throw new RuntimeException("토큰에 권한 정보가 없습니다.");
         }
 
         List<SimpleGrantedAuthority> authentication = Arrays.stream(claims.get(KEY_ROLES).toString().split(" "))
@@ -98,8 +96,6 @@ public class TokenProvider {
                     .getBody();
         } catch (ExpiredJwtException e) {
             return e.getClaims();
-        } catch (Exception e) {
-            throw new JwtException(ErrorCode.INVALID_TOKEN);
         }
     }
 

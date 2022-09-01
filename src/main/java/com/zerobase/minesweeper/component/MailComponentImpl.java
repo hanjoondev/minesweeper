@@ -1,7 +1,5 @@
 package com.zerobase.minesweeper.component;
 
-import com.zerobase.minesweeper.exception.GamerException;
-import com.zerobase.minesweeper.type.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -28,10 +26,9 @@ public class MailComponentImpl implements MailComponent{
 
             javaMailSender.send(msg);
             return true;
-            //throw new GamerException(ErrorCode.INTERNAL_SERVER_ERROR);
 
         } catch (Exception e) {
-            throw new GamerException(ErrorCode.INTERNAL_SERVER_ERROR);
+            throw new RuntimeException("이메일 전송 실패");
         }
     }
 }

@@ -2,9 +2,7 @@ package com.zerobase.minesweeper.service;
 
 import com.zerobase.minesweeper.component.MailComponent;
 import com.zerobase.minesweeper.entity.Gamer;
-import com.zerobase.minesweeper.exception.GamerException;
 import com.zerobase.minesweeper.repository.GamerRepository;
-import com.zerobase.minesweeper.type.ErrorCode;
 import com.zerobase.minesweeper.type.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -28,7 +26,7 @@ public class GamerService {
     }
 
     @Transactional
-    public void gamerSignUp(String email, String name, String password) {
+    public boolean gamerSignUp(String email, String name, String password) {
 
         String validationKey = generateValidationKey();
         System.out.println(validationKey);
@@ -45,6 +43,8 @@ public class GamerService {
                 .role(Role.ROLE_USER).build());
 
         sendValidationKey(email, validationKey);
+
+        return true;
     }
 
     private String generateValidationKey() {
@@ -64,9 +64,9 @@ public class GamerService {
     }
 
     @Transactional
-    public void gamerActivation(String email, String validationKey) {
+    public boolean gamerActivation(String email, String validationKey) {
 
-        Gamer gamer = gamerRepository.findByMail(email).orElseThrow(() -> new GamerException(ErrorCode.USER_NOT_FOUND));
+        Gamer gamer = gamerRepository.findByMail(email).orElseThrow();
 
         if (!gamer.isVerified()) {
             if (BCrypt.checkpw(validationKey, gamer.getAuthCode())) {
@@ -74,18 +74,20 @@ public class GamerService {
                 gamer.setVerified(true);
                 gamerRepository.save(gamer);
 
+                return true;
+
             } else {
-                throw new GamerException(ErrorCode.VALIDATION_KEY_MIS_MATCH);
+                return false;
             }
         } else {
-            throw new GamerException(ErrorCode.USER_ALREADY_VALIDATED);
+            throw new RuntimeException("이미 인증 처리된 계정입니다");
         }
     }
 
     @Transactional
-    public void reissueValidationKey(String email) {
+    public boolean reissueValidationKey(String email) {
 
-        Gamer gamer = gamerRepository.findByMail(email).orElseThrow(() -> new GamerException(ErrorCode.USER_NOT_FOUND));
+        Gamer gamer = gamerRepository.findByMail(email).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
 
         if (!gamer.isVerified()) {
 
@@ -97,33 +99,38 @@ public class GamerService {
 
             sendValidationKey(email, validationKey);
 
+            return true;
+
         } else {
-            throw new GamerException(ErrorCode.USER_ALREADY_VALIDATED);
+            throw new RuntimeException("이미 인증 처리된 계정입니다");
         }
     }
 
     @Transactional
-    public void updateGamerInfo(String email, String name) {
+    public boolean updateGamerInfo(String email, String name) {
 
-        Gamer gamer = gamerRepository.findByMail(email).orElseThrow(() -> new GamerException(ErrorCode.USER_NOT_FOUND));
+        Gamer gamer = gamerRepository.findByMail(email).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
 
         gamer.setName(name);
         gamerRepository.save(gamer);
 
+        return true;
     }
 
     @Transactional
-    public void deleteGamer(String email, String password) {
+    public boolean deleteGamer(String email, String password) {
 
-        Gamer gamer = gamerRepository.findByMail(email).orElseThrow(() -> new GamerException(ErrorCode.USER_NOT_FOUND));
+        Gamer gamer = gamerRepository.findByMail(email).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
 
         if (BCrypt.checkpw(password, gamer.getPswd())) {
 
             gamerRepository.delete(gamer);
 
+            return true;
+
         } else {
 
-            throw new GamerException(ErrorCode.PASSWORD_MIS_MATCH);
+            return false;
         }
 
     }
