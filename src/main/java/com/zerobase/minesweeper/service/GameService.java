@@ -8,8 +8,6 @@ import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
-import com.zerobase.minesweeper.exception.GameException;
-import com.zerobase.minesweeper.type.ErrorCode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -218,16 +216,5 @@ public class GameService {
                 .mediumTime(m)
                 .hardTime(h)
                 .build();
-    }
-
-    @Transactional
-    public boolean deleteGame(String gameId) {
-
-        Long id = Long.valueOf(gameId);
-        Game game = gameRepository.findById(id).orElseThrow(() -> new GameException(ErrorCode.GAME_NOT_FOUND));
-
-        gameRepository.delete(game);
-
-        return true;
     }
 }

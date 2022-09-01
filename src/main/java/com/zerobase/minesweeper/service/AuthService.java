@@ -45,11 +45,6 @@ public class AuthService implements UserDetailsService {
             throw new GamerException(ErrorCode.NOT_AUTHENTICATED_EMAIL);
         }
 
-        //회원 정지 시 로그인 불가!
-        if (gamer.isSuspend()) {
-            throw new GamerException(ErrorCode.USER_HAS_BEEN_BANNED);
-        }
-
         return new User(gamer.getId().toString(), gamer.getPswd(),
                 List.of(new SimpleGrantedAuthority(gamer.getRole().toString())));
     }

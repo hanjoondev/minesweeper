@@ -10,12 +10,10 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class GamerUpdatePasswordRequest {
+public class GamerDeleteRequest {
     @Email
     @NotBlank
     private String email;
     @NotBlank
-    private String oldPassword;
-    @NotBlank
-    private String newPassword;
+    private String password;
 }
