@@ -12,6 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
@@ -46,6 +47,7 @@ public class GamerService {
                 .authCode(encValidationKey)
                 .isVerified(false)
                 .isSuspend(false)
+                .verifiedDt(LocalDateTime.MIN)
                 .role(Role.ROLE_USER).build());
 
         sendValidationKey(email, validationKey);
@@ -76,6 +78,7 @@ public class GamerService {
             if (BCrypt.checkpw(validationKey, gamer.getAuthCode())) {
 
                 gamer.setVerified(true);
+                gamer.setVerifiedDt(LocalDateTime.now());
                 gamerRepository.save(gamer);
 
             } else {
@@ -132,80 +135,7 @@ public class GamerService {
 
     }
 
-    @Transactional
-    public List<GamerDto> getGamers() {
 
-        List<Gamer> gamers = gamerRepository.findAll();
-
-        return gamers.stream()
-                .filter(gamer -> gamer.getRole().equals(Role.ROLE_USER))
-                .map(gamer -> GamerDto.builder()
-                        .id(gamer.getId())
-                        .name(gamer.getName())
-                        .mail(gamer.getMail())
-                        .isVerified(gamer.isVerified())
-                        .isSuspend(gamer.isSuspend())
-                        .regDt(gamer.getRegDt())
-                        .verifiedDt(gamer.getVerifiedDt())
-                        .build())
-                .collect(Collectors.toList());
-    }
-
-    @Transactional
-    public GamerDto getGamerInfo(Long gamerId) {
-
-        Gamer gamer = gamerRepository.findById(gamerId).orElseThrow(() -> new GamerException(ErrorCode.USER_NOT_FOUND));
-
-        return GamerDto.builder()
-                .id(gamer.getId())
-                .name(gamer.getName())
-                .mail(gamer.getMail())
-                .isVerified(gamer.isVerified())
-                .isSuspend(gamer.isSuspend())
-                .regDt(gamer.getRegDt())
-                .verifiedDt(gamer.getVerifiedDt())
-                .build();
-    }
-
-    @Transactional
-    public void deleteGamer(Long gamerId) {
-
-        Gamer gamer = gamerRepository.findById(gamerId).orElseThrow(() -> new GamerException(ErrorCode.USER_NOT_FOUND));
-
-        gamerRepository.delete(gamer);
-
-    }
-
-    @Transactional
-    public void suspendGamer(Long gamerId, boolean suspend) {
-
-        Gamer gamer = gamerRepository.findById(gamerId).orElseThrow(() -> new GamerException(ErrorCode.USER_NOT_FOUND));
-
-        gamer.setSuspend(suspend);
-
-        gamerRepository.save(gamer);
-
-    }
-
-    @Transactional
-    public List<GamerDto> searchGamers(String keyword) {
-
-        List<Gamer> gamers = gamerRepository.findByNameOrMailContains(keyword, keyword);
-
-        return gamers.stream()
-                .filter(gamer -> gamer.getRole().equals(Role.ROLE_USER))
-                .map(gamer -> GamerDto.builder()
-                        .id(gamer.getId())
-                        .name(gamer.getName())
-                        .mail(gamer.getMail())
-                        .isVerified(gamer.isVerified())
-                        .isSuspend(gamer.isSuspend())
-                        .regDt(gamer.getRegDt())
-                        .verifiedDt(gamer.getVerifiedDt())
-                        .build())
-                .collect(Collectors.toList());
-
-    }
 
     @Transactional
     public void updateGamerPassword(String email, String oldPassword, String newPassword) {

@@ -219,15 +219,4 @@ public class GameService {
                 .hardTime(h)
                 .build();
     }
-
-    @Transactional
-    public boolean deleteGame(String gameId) {
-
-        Long id = Long.valueOf(gameId);
-        Game game = gameRepository.findById(id).orElseThrow(() -> new GameException(ErrorCode.GAME_NOT_FOUND));
-
-        gameRepository.delete(game);
-
-        return true;
-    }
 }
