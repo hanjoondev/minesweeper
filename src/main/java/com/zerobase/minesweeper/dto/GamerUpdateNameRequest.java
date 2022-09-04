@@ -16,4 +16,6 @@ public class GamerUpdateNameRequest {
     private String email;
     @NotBlank
     private String name;
+    @NotBlank
+    private String password;
 }

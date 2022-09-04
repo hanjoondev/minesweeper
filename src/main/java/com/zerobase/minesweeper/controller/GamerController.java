@@ -52,7 +52,7 @@ public class GamerController {
     //회원정보 수정 (닉네임)
     @PatchMapping("/gamer/name")
     public ResponseEntity<?> updateGamerName(@RequestBody @Valid GamerUpdateNameRequest request) {
-        gamerService.updateGamerName(request.getEmail(), request.getName());
+        gamerService.updateGamerName(request.getEmail(), request.getName(), request.getPassword());
         return ResponseEntity.ok(HttpStatus.OK);
     }
 

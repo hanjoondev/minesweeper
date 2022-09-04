@@ -110,12 +110,19 @@ public class GamerService {
     }
 
     @Transactional
-    public void updateGamerName(String email, String name) {
+    public void updateGamerName(String email, String name, String password) {
 
         Gamer gamer = gamerRepository.findByMail(email).orElseThrow(() -> new GamerException(ErrorCode.USER_NOT_FOUND));
 
-        gamer.setName(name);
-        gamerRepository.save(gamer);
+        if (BCrypt.checkpw(password, gamer.getPswd())) {
+
+            gamer.setName(name);
+            gamerRepository.save(gamer);
+
+        } else {
+
+            throw new GamerException(ErrorCode.PASSWORD_MIS_MATCH);
+        }
 
     }
 
