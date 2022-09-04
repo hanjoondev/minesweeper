@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.zerobase'
-version = '0.0.1-SNAPSHOT'
+version = '0.0.2-SNAPSHOT'
 sourceCompatibility = '11'
 
 configurations {
@@ -30,6 +30,7 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
     implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
     compileOnly 'org.projectlombok:lombok'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
     runtimeOnly 'mysql:mysql-connector-java'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -43,5 +44,5 @@ tasks.named('test') {
 apply plugin:'war'
 
 war {
-    archiveName = 'minesweeper.war'
+    archiveName = 'msv2.war'
 }

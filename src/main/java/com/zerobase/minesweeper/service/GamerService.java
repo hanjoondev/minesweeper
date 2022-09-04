@@ -1,15 +1,22 @@
 package com.zerobase.minesweeper.service;
 
 import com.zerobase.minesweeper.component.MailComponent;
+import com.zerobase.minesweeper.dto.GamerDto;
 import com.zerobase.minesweeper.entity.Gamer;
+import com.zerobase.minesweeper.exception.GamerException;
 import com.zerobase.minesweeper.repository.GamerRepository;
+import com.zerobase.minesweeper.type.ErrorCode;
 import com.zerobase.minesweeper.type.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
+
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +33,7 @@ public class GamerService {
     }
 
     @Transactional
-    public boolean gamerSignUp(String email, String name, String password) {
+    public void gamerSignUp(String email, String name, String password) {
 
         String validationKey = generateValidationKey();
         System.out.println(validationKey);
@@ -40,11 +47,11 @@ public class GamerService {
                 .mail(email)
                 .authCode(encValidationKey)
                 .isVerified(false)
+                .isSuspend(false)
+                .verifiedDt(LocalDateTime.MIN)
                 .role(Role.ROLE_USER).build());
 
         sendValidationKey(email, validationKey);
-
-        return true;
     }
 
     private String generateValidationKey() {
@@ -64,30 +71,29 @@ public class GamerService {
     }
 
     @Transactional
-    public boolean gamerActivation(String email, String validationKey) {
+    public void gamerActivation(String email, String validationKey) {
 
-        Gamer gamer = gamerRepository.findByMail(email).orElseThrow();
+        Gamer gamer = gamerRepository.findByMail(email).orElseThrow(() -> new GamerException(ErrorCode.USER_NOT_FOUND));
 
         if (!gamer.isVerified()) {
             if (BCrypt.checkpw(validationKey, gamer.getAuthCode())) {
 
                 gamer.setVerified(true);
+                gamer.setVerifiedDt(LocalDateTime.now());
                 gamerRepository.save(gamer);
 
-                return true;
-
             } else {
-                return false;
+                throw new GamerException(ErrorCode.VALIDATION_KEY_MIS_MATCH);
             }
         } else {
-            throw new RuntimeException("이미 인증 처리된 계정입니다");
+            throw new GamerException(ErrorCode.USER_ALREADY_VALIDATED);
         }
     }
 
     @Transactional
-    public boolean reissueValidationKey(String email) {
+    public void reissueValidationKey(String email) {
 
-        Gamer gamer = gamerRepository.findByMail(email).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
+        Gamer gamer = gamerRepository.findByMail(email).orElseThrow(() -> new GamerException(ErrorCode.USER_NOT_FOUND));
 
         if (!gamer.isVerified()) {
 
@@ -99,40 +105,87 @@ public class GamerService {
 
             sendValidationKey(email, validationKey);
 
-            return true;
-
         } else {
-            throw new RuntimeException("이미 인증 처리된 계정입니다");
+            throw new GamerException(ErrorCode.USER_ALREADY_VALIDATED);
         }
     }
 
     @Transactional
-    public boolean updateGamerInfo(String email, String name) {
+    public void updateGamerName(String email, String name, String password) {
 
-        Gamer gamer = gamerRepository.findByMail(email).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
+        Gamer gamer = gamerRepository.findByMail(email).orElseThrow(() -> new GamerException(ErrorCode.USER_NOT_FOUND));
 
-        gamer.setName(name);
-        gamerRepository.save(gamer);
+        if (BCrypt.checkpw(password, gamer.getPswd())) {
 
-        return true;
+            gamer.setName(name);
+            gamerRepository.save(gamer);
+
+        } else {
+
+            throw new GamerException(ErrorCode.PASSWORD_MIS_MATCH);
+        }
+
     }
 
     @Transactional
-    public boolean deleteGamer(String email, String password) {
+    public void withdrawalGamer(String email, String password) {
 
-        Gamer gamer = gamerRepository.findByMail(email).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
+        Gamer gamer = gamerRepository.findByMail(email).orElseThrow(() -> new GamerException(ErrorCode.USER_NOT_FOUND));
 
         if (BCrypt.checkpw(password, gamer.getPswd())) {
 
             gamerRepository.delete(gamer);
 
-            return true;
+        } else {
+
+            throw new GamerException(ErrorCode.PASSWORD_MIS_MATCH);
+        }
+
+    }
+
+    @Transactional
+    public void updateGamerPassword(String email, String oldPassword, String newPassword) {
+
+        Gamer gamer = gamerRepository.findByMail(email).orElseThrow(() -> new GamerException(ErrorCode.USER_NOT_FOUND));
+
+        if (BCrypt.checkpw(oldPassword, gamer.getPswd())) {
+
+            gamer.setPswd(BCrypt.hashpw(newPassword, BCrypt.gensalt()));
+            gamerRepository.save(gamer);
 
         } else {
 
-            return false;
+            throw new GamerException(ErrorCode.PASSWORD_MIS_MATCH);
         }
+    }
 
+    @Transactional
+    public void lostGamerPassword(String email) {
+
+        Gamer gamer = gamerRepository.findByMail(email).orElseThrow(() -> new GamerException(ErrorCode.USER_NOT_FOUND));
+
+        String password = generateRandomPassword();
+        gamer.setPswd(BCrypt.hashpw(password, BCrypt.gensalt()));
+        gamerRepository.save(gamer);
+
+        sendRandomPassword(email, password);
+
+    }
+
+    private String generateRandomPassword() {
+        return String.valueOf(ThreadLocalRandom.current().nextInt(10000000, 100000000));
+    }
+
+    private boolean sendRandomPassword(String email, String randomPassword) {
+        String subject = randomPassword + "는 회원님의 임시 비밀번호 입니다. Minesweeper";
+        String text = "<p>안녕하세요 Minesweeper 입니다.<p>" +
+                "<p>회원님의 임시 비밀번호는</p>" +
+                "<h2>" + randomPassword + "</h2>" +
+                "<p>입니다.</p>" +
+                "<p>임시 비밀번호를 사용하여 로그인 하신 후, 비밀번호를 변경해 주세요</p>" +
+                "<p>감사합니다</p>" +
+                "<div><a target='_blank' href='???'> Minesweeper 로 이동하기 </a></div>";
+        return mailComponent.sendMail(email, subject, text);
     }
 }
 

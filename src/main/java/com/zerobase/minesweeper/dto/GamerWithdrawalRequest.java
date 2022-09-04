@@ -10,7 +10,7 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class GamerDeleteRequest {
+public class GamerWithdrawalRequest {
     @Email
     @NotBlank
     private String email;
