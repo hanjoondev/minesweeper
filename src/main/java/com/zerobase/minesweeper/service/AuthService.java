@@ -1,5 +1,6 @@
 package com.zerobase.minesweeper.service;
 
+import com.zerobase.minesweeper.dto.LoginResponse;
 import com.zerobase.minesweeper.dto.TokenDto;
 import com.zerobase.minesweeper.dto.TokensRequest;
 import com.zerobase.minesweeper.entity.Gamer;
@@ -59,7 +60,7 @@ public class AuthService implements UserDetailsService {
      *   토큰발급
      * */
     @Transactional
-    public TokenDto login(String email, String password) {
+    public LoginResponse login(String email, String password) {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
 
         Authentication authentication = getAuthentication(authenticationToken);
@@ -67,8 +68,15 @@ public class AuthService implements UserDetailsService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         TokenDto tokenDto = tokenProvider.generateToken(authentication);
 
-        refreshTokenRepository.save(new RefreshToken(Long.parseLong(authentication.getName()), tokenDto.getRefreshToken()));
-        return tokenDto;
+        Gamer gamer = getGamerByAuthentication(authentication);
+
+        refreshTokenRepository.save(new RefreshToken(gamer.getId(), tokenDto.getRefreshToken()));
+        return new LoginResponse(tokenDto, gamer.getId(), gamer.getName());
+    }
+
+    private Gamer getGamerByAuthentication(Authentication authentication) {
+        return gamerRepository.findById(Long.valueOf(authentication.getName()))
+                .orElseThrow(() -> new GamerException(ErrorCode.USER_NOT_FOUND));
     }
 
     private Authentication getAuthentication(UsernamePasswordAuthenticationToken authenticationToken) {
@@ -81,34 +89,30 @@ public class AuthService implements UserDetailsService {
     }
 
     @Transactional
-    public TokenDto reissue(TokensRequest request) {
+    public LoginResponse reissue(TokensRequest request) {
         if (!tokenProvider.validateToken(request.getRefreshToken())) {
             throw new JwtException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
-
         Authentication authentication = tokenProvider.getAuthentication(request.getAccessToken());
+        Gamer gamer = getGamerByAuthentication(authentication);
 
-        RefreshToken refreshToken = refreshTokenRepository.findByGamerId(Long.valueOf(authentication.getName()))
-                .orElseThrow(() -> new JwtException(ErrorCode.NOT_FOUND_USER_TOKEN));
-
+        RefreshToken refreshToken = refreshTokenRepository.findByGamerId(gamer.getId())
+                                     .orElseThrow(() -> new JwtException(ErrorCode.NOT_FOUND_USER_TOKEN));
         if (!refreshToken.getToken().equals(request.getRefreshToken())) {
             throw new JwtException(ErrorCode.MIS_MATCH_TOKEN);
         }
 
         TokenDto tokenDto = tokenProvider.generateToken(authentication);
-
         refreshToken.updateToken(tokenDto.getRefreshToken()); // update refresh token in db
 
-        return tokenDto;
+        return new LoginResponse(tokenDto, gamer.getId(), gamer.getName());
     }
 
     @Transactional
     public void logout(TokensRequest request) {
         Authentication authentication = tokenProvider.getAuthentication(request.getAccessToken());
 
-        RefreshToken refreshToken = refreshTokenRepository.findByGamerId(Long.valueOf(authentication.getName()))
-                .orElseThrow(() -> new JwtException(ErrorCode.NOT_FOUND_USER_TOKEN));
-
-        refreshTokenRepository.delete(refreshToken);
+        refreshTokenRepository.delete(refreshTokenRepository.findByGamerId(Long.valueOf(authentication.getName()))
+                .orElseThrow(() -> new JwtException(ErrorCode.NOT_FOUND_USER_TOKEN)));
     }
 }

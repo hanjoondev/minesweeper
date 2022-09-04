@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
@@ -141,8 +142,6 @@ public class GamerService {
         }
 
     }
-
-
 
     @Transactional
     public void updateGamerPassword(String email, String oldPassword, String newPassword) {

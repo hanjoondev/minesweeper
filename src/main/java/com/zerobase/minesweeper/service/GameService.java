@@ -1,7 +1,6 @@
 package com.zerobase.minesweeper.service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -10,6 +9,9 @@ import javax.transaction.Transactional;
 
 import com.zerobase.minesweeper.exception.GameException;
 import com.zerobase.minesweeper.type.ErrorCode;
+
+import com.zerobase.minesweeper.type.Role;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +23,7 @@ import com.zerobase.minesweeper.dto.GameResponse;
 import com.zerobase.minesweeper.dto.GamerStatResponse;
 import com.zerobase.minesweeper.dto.GetGameListResponse;
 import com.zerobase.minesweeper.dto.GetGameResponse;
+import com.zerobase.minesweeper.dto.LandingPageDto;
 import com.zerobase.minesweeper.dto.RankingResponse;
 import com.zerobase.minesweeper.dto.Rank;
 import com.zerobase.minesweeper.entity.Game;
@@ -134,31 +137,23 @@ public class GameService {
                 .build();
     }
 
-    public RankingResponse getRanking(String difficulty, Integer pageIdx, Integer pageSize) {
-        Pageable pageable = PageRequest.of(pageIdx, pageSize, Sort.by("timePlayed").ascending());
-        Page<Game> page = gameRepository.findByDifficulty(difficulty, pageable);
-        RankingResponse response = RankingResponse.builder()
-                                                  .difficulty(difficulty)
-                                                  .firstPage(page.isFirst())
-                                                  .lastPage(page.isLast())
-                                                  .numberOfElements(page.getNumberOfElements())
-                                                  .totalElements(page.getTotalElements())
-                                                  .contents(new ArrayList<>())
-                                                  .build();
-        HashMap<Long, String> names = new HashMap<>();
-        Integer numItems = page.getNumberOfElements();
-        Long start = page.getPageable().getOffset() + 1;
-        for (int i = 0; i < numItems; i++) {
-            Long gameId = page.getContent().get(i).getId(), gamerId = page.getContent().get(i).getGamerId();
-            Boolean isAnon = page.getContent().get(i).getIsAnon();
-            Double timePlayed = page.getContent().get(i).getTimePlayed();
-            names.computeIfAbsent(gamerId,
-                    k -> isAnon ? "anonymous" + String.valueOf(gamerId)
-                                : gamerRepository.findById(gamerId).get().getName());
-            response.getContents()
-                    .add(new Rank(start + i, names.get(gamerId), timePlayed, gameId, gamerId));
+    public LandingPageDto getLandingPageRanking() {
+        List<Ranking> eList = rankingRepository.findTop3ByOrderByEasyTimeAsc();
+        List<Ranking> mList = rankingRepository.findTop3ByOrderByMediumTimeAsc();
+        List<Ranking> hList = rankingRepository.findTop3ByOrderByHardTimeAsc();
+        List<Rank> easy = new ArrayList<>(), medium = new ArrayList<>(), hard = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            long rank = i + 1;
+            Ranking e = eList.get(i), m = mList.get(i), h = hList.get(i);
+            easy.add(new Rank(rank, e.getGamerName(), e.getEasyTime(), e.getEasyId(), e.getGamerId()));
+            medium.add(new Rank(rank, m.getGamerName(), m.getMediumTime(), m.getMediumId(), m.getGamerId()));
+            hard.add(new Rank(rank, h.getGamerName(), h.getHardTime(), h.getHardId(), h.getGamerId()));
         }
-        return response;
+        return LandingPageDto.builder()
+                             .easy(easy)
+                             .medium(medium)
+                             .hard(hard)
+                             .build();
     }
 
     public RankingResponse getGamerRanking(String difficulty, Integer pageIdx, Integer pageSize) {
@@ -217,6 +212,18 @@ public class GameService {
                 .easyTime(e)
                 .mediumTime(m)
                 .hardTime(h)
+                .isAdmin(gamerRepository.findById(id).get().getRole().equals(Role.ROLE_ADMIN) ? true : false)
                 .build();
+    }
+
+    @Transactional
+    public boolean deleteGame(String gameId) {
+
+        Long id = Long.valueOf(gameId);
+        Game game = gameRepository.findById(id).orElseThrow(() -> new GameException(ErrorCode.GAME_NOT_FOUND));
+
+        gameRepository.delete(game);
+
+        return true;
     }
 }

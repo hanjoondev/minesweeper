@@ -20,6 +20,7 @@ public class GamerStatResponse {
     Double easyTime;
     Double mediumTime;
     Double hardTime;
+    Boolean isAdmin;
     @Builder.Default
     Integer errorCode = 0;
 }
