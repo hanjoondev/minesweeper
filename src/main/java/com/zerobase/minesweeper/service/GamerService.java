@@ -48,7 +48,6 @@ public class GamerService {
                 .authCode(encValidationKey)
                 .isVerified(false)
                 .isSuspend(false)
-                .verifiedDt(LocalDateTime.MIN)
                 .role(Role.ROLE_USER).build());
 
         sendValidationKey(email, validationKey);
