@@ -29,7 +29,8 @@ public class AdminController {
                         .id(gamerDto.getId())
                         .name(gamerDto.getName())
                         .mail(gamerDto.getMail())
-                        .regDt(gamerDto.getRegDt().toLocalDate())
+                        .isSuspend(gamerDto.isSuspend())
+                        .isVerified(gamerDto.isVerified())
                         .build())
                 .collect(Collectors.toList()));
     }
@@ -75,7 +76,8 @@ public class AdminController {
                         .id(gamerDto.getId())
                         .name(gamerDto.getName())
                         .mail(gamerDto.getMail())
-                        .regDt(gamerDto.getRegDt().toLocalDate())
+                        .isSuspend(gamerDto.isSuspend())
+                        .isVerified(gamerDto.isVerified())
                         .build())
                 .collect(Collectors.toList()));
     }
