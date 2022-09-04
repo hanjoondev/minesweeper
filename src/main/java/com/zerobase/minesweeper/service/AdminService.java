@@ -86,7 +86,7 @@ public class AdminService {
         List<Gamer> gamers = gamerRepository.findByNameOrMailContains(keyword, keyword);
 
         return gamers.stream()
-                .filter(gamer -> !gamer.getMail().isBlank() || gamer.getRole().equals(Role.ROLE_USER))
+                .filter(gamer -> !gamer.getMail().isBlank() && gamer.getRole().equals(Role.ROLE_USER))
                 .map(gamer -> GamerDto.builder()
                         .id(gamer.getId())
                         .name(gamer.getName())
