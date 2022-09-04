@@ -9,6 +9,7 @@ import javax.transaction.Transactional;
 
 import com.zerobase.minesweeper.exception.GameException;
 import com.zerobase.minesweeper.type.ErrorCode;
+
 import com.zerobase.minesweeper.type.Role;
 
 import org.springframework.data.domain.Page;
