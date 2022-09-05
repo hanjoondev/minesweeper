@@ -69,7 +69,7 @@ public class SecurityConfig {
 
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                    .antMatchers("/", "/auth/**",
+                    .antMatchers("/", "/auth/**", "/chat-lobby/**",
                             "/stomp/**")
                     .permitAll()
                 /*  로그인 인증 필요없는 url 설정

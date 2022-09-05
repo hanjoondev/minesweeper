@@ -47,6 +47,10 @@ public class LobbyChatService {
 
     public LobbyChatResponse getOldChat(Long lastIndex) {
         List<LobbyChat> lobbyChats = lobbyChatRepository.findByIdBetween(Math.max(0, lastIndex - CHAT_CACHE_SIZE), lastIndex);
+        if (lobbyChats.size() == 0) {
+            return new LobbyChatResponse(Collections.emptyList(), lastIndex);
+        }
+
         List<LobbyChatDto> lobbyChatDtos = lobbyChats
                         .stream()
                         .map(LobbyChatDto::fromEntity)
