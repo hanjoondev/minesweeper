@@ -1,5 +1,6 @@
 package com.zerobase.minesweeper.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -16,4 +17,7 @@ public interface RankingRepository extends PagingAndSortingRepository<Ranking, L
     Long countByEasyTimeLessThan(Double easyTIme);
     Long countByMediumTimeLessThan(Double mediumTime);
     Long countByHardTimeLessThan(Double hardTime);
+    List<Ranking> findTop3ByOrderByEasyTimeAsc();
+    List<Ranking> findTop3ByOrderByMediumTimeAsc();
+    List<Ranking> findTop3ByOrderByHardTimeAsc();
 }

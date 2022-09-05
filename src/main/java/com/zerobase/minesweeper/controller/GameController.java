@@ -12,6 +12,7 @@ import com.zerobase.minesweeper.dto.GameResponse;
 import com.zerobase.minesweeper.dto.GamerStatResponse;
 import com.zerobase.minesweeper.dto.GetGameListResponse;
 import com.zerobase.minesweeper.dto.GetGameResponse;
+import com.zerobase.minesweeper.dto.LandingPageDto;
 import com.zerobase.minesweeper.dto.RankingResponse;
 import com.zerobase.minesweeper.service.GameService;
 
@@ -38,11 +39,8 @@ public class GameController {
     }
 
     @GetMapping(value = "game/ranking", produces = "application/json")
-    public RankingResponse getRanking(
-            @RequestParam String difficulty,
-            @RequestParam Integer pageIdx,
-            @RequestParam Integer pageSize) {
-        return gameService.getRanking(difficulty, pageIdx, pageSize);
+    public LandingPageDto getLandingPageRanking() {
+        return gameService.getLandingPageRanking();
     }
 
     @GetMapping(value = "game/gamer-ranking", produces = "application/json")
@@ -57,18 +55,4 @@ public class GameController {
     public GamerStatResponse getGamerStat(@PathVariable String gamerId) {
         return gameService.getGamerStat(gamerId);
     }
-
-    /*
-    관리자 페이지 용
-    */
-
-    //게임 삭제
-    @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("game/{gameId}")
-    public ResponseEntity<?> deleteGame(@PathVariable String gameId){
-        gameService.deleteGame(gameId);
-        return ResponseEntity.ok(HttpStatus.OK);
-    }
-
-
 }
