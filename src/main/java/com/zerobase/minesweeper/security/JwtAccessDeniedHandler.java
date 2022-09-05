@@ -33,7 +33,6 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
     private void set403ErrorResponse(HttpServletResponse response) throws IOException {
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setCharacterEncoding("UTF-8");
 
         objectMapper.writeValue(response.getWriter(), new ErrorResponse(NEED_TO_ROLE_ADMIN, NEED_TO_ROLE_ADMIN.getDescription()));
     }
