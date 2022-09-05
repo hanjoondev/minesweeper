@@ -65,6 +65,7 @@ public class SecurityConfig {
                 .antMatchers(
                     "/",
                     "/auth/**",
+                    "/chat-lobby/**",
                     "/stomp/**"
                 )
                 .permitAll()
