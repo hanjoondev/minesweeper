@@ -1,7 +1,12 @@
 package com.zerobase.minesweeper.dto;
 
 import com.zerobase.minesweeper.type.ErrorCode;
-import lombok.*;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter

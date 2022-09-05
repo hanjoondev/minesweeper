@@ -1,17 +1,7 @@
 package com.zerobase.minesweeper.service;
 
-import com.zerobase.minesweeper.dto.LoginResponse;
-import com.zerobase.minesweeper.dto.TokenDto;
-import com.zerobase.minesweeper.dto.TokensRequest;
-import com.zerobase.minesweeper.entity.Gamer;
-import com.zerobase.minesweeper.entity.RefreshToken;
-import com.zerobase.minesweeper.exception.GamerException;
-import com.zerobase.minesweeper.exception.JwtException;
-import com.zerobase.minesweeper.repository.GamerRepository;
-import com.zerobase.minesweeper.repository.RefreshTokenRepository;
-import com.zerobase.minesweeper.security.TokenProvider;
-import com.zerobase.minesweeper.type.ErrorCode;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -25,7 +15,19 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import com.zerobase.minesweeper.dto.LoginResponse;
+import com.zerobase.minesweeper.dto.TokenDto;
+import com.zerobase.minesweeper.dto.TokensRequest;
+import com.zerobase.minesweeper.entity.Gamer;
+import com.zerobase.minesweeper.entity.RefreshToken;
+import com.zerobase.minesweeper.exception.GamerException;
+import com.zerobase.minesweeper.exception.JwtException;
+import com.zerobase.minesweeper.repository.GamerRepository;
+import com.zerobase.minesweeper.repository.RefreshTokenRepository;
+import com.zerobase.minesweeper.security.TokenProvider;
+import com.zerobase.minesweeper.type.ErrorCode;
+
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
@@ -55,10 +57,7 @@ public class AuthService implements UserDetailsService {
                 List.of(new SimpleGrantedAuthority(gamer.getRole().toString())));
     }
 
-    /*
-     *   db에서 멤버 확인
-     *   토큰발급
-     * */
+    // db에서 멤버 확인, 토큰발급
     @Transactional
     public LoginResponse login(String email, String password) {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, password);

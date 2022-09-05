@@ -2,27 +2,30 @@ package com.zerobase.minesweeper.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zerobase.minesweeper.dto.ErrorResponse;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import static com.zerobase.minesweeper.type.ErrorCode.NEED_TO_ROLE_ADMIN;
+
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-
-import static com.zerobase.minesweeper.type.ErrorCode.NEED_TO_ROLE_ADMIN;
 
 @Slf4j
 @RequiredArgsConstructor
 @Component
 public class JwtAccessDeniedHandler implements AccessDeniedHandler {
     private final ObjectMapper objectMapper;
-    /*
-     *   필요한 권한(role)이 없이 접근하려 할때 403반환
-     * */
+    
+    // 필요한 권한(role)이 없이 접근하려 할때 403반환
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException {
         log.error("Jwt Access denied, cause : {}", accessDeniedException.getMessage());

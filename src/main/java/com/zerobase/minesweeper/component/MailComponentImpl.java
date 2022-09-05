@@ -1,12 +1,14 @@
 package com.zerobase.minesweeper.component;
 
-import com.zerobase.minesweeper.exception.GamerException;
-import com.zerobase.minesweeper.type.ErrorCode;
-import lombok.RequiredArgsConstructor;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.stereotype.Component;
+
+import com.zerobase.minesweeper.exception.GamerException;
+import com.zerobase.minesweeper.type.ErrorCode;
+
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Component

@@ -6,7 +6,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum ErrorCode {
-
     USER_NOT_FOUND("사용자가 없습니다."),
     GAME_NOT_FOUND("게임 데이터가 없습니다."),
     USER_HAS_BEEN_BANNED("사용자가 정지되었습니다."),
@@ -20,8 +19,6 @@ public enum ErrorCode {
     INVALID_REFRESH_TOKEN("refresh token이 유효하지 않습니다. 재로그인이 필요합니다."),
     INVALID_TOKEN("token 값이 유효하지 않습니다."),
     NEED_TO_ROLE_ADMIN("관리자 권한이 필요합니다."),
-    INTERNAL_SERVER_ERROR("서버에 이상이 생겼습니다")
-    ;
-
+    INTERNAL_SERVER_ERROR("서버에 이상이 생겼습니다");
     private final String description;
 }

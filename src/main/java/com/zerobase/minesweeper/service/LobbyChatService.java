@@ -1,18 +1,23 @@
 package com.zerobase.minesweeper.service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
 import com.zerobase.minesweeper.dto.ChatMessage;
 import com.zerobase.minesweeper.dto.LobbyChatDto;
 import com.zerobase.minesweeper.dto.LobbyChatResponse;
 import com.zerobase.minesweeper.entity.LobbyChat;
 import com.zerobase.minesweeper.repository.LobbyChatRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
@@ -20,9 +25,9 @@ public class LobbyChatService {
     private final LobbyChatRepository lobbyChatRepository;
 
     private static final Queue<LobbyChatDto> chatCacheQueue = new ConcurrentLinkedQueue<>();
-    private static long lastIndex;
     private static final int CHAT_CACHE_SIZE = 30;
     private static final DateTimeFormatter customTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static long lastIndex;
 
     public LobbyChatResponse getRecentlyChats() {
         return new LobbyChatResponse(new ArrayList<>(chatCacheQueue), lastIndex);
