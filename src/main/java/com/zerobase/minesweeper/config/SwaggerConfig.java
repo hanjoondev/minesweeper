@@ -14,7 +14,6 @@ import springfox.documentation.spring.web.plugins.Docket;
 @Configuration
 @EnableWebMvc
 public class SwaggerConfig {
-
     private ApiInfo swaggerInfo() {
         return new ApiInfoBuilder().title("Minesweeper API")
                 .description("Minesweeper API Docs").build();
@@ -29,5 +28,4 @@ public class SwaggerConfig {
                 .build()
                 .useDefaultResponseMessages(false);
     }
-
 }

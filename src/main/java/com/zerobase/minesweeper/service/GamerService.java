@@ -1,22 +1,21 @@
 package com.zerobase.minesweeper.service;
 
+import java.time.LocalDateTime;
+import java.util.concurrent.ThreadLocalRandom;
+
+import javax.transaction.Transactional;
+
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.stereotype.Service;
+
 import com.zerobase.minesweeper.component.MailComponent;
-import com.zerobase.minesweeper.dto.GamerDto;
 import com.zerobase.minesweeper.entity.Gamer;
 import com.zerobase.minesweeper.exception.GamerException;
 import com.zerobase.minesweeper.repository.GamerRepository;
 import com.zerobase.minesweeper.type.ErrorCode;
 import com.zerobase.minesweeper.type.Role;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCrypt;
-import org.springframework.stereotype.Service;
-
-import javax.transaction.Transactional;
-import java.time.LocalDateTime;
-
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -48,7 +47,6 @@ public class GamerService {
                 .authCode(encValidationKey)
                 .isVerified(false)
                 .isSuspend(false)
-                .verifiedDt(LocalDateTime.MIN)
                 .role(Role.ROLE_USER).build());
 
         sendValidationKey(email, validationKey);
@@ -188,4 +186,3 @@ public class GamerService {
         return mailComponent.sendMail(email, subject, text);
     }
 }
-

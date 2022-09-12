@@ -1,5 +1,11 @@
 package com.zerobase.minesweeper.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.transaction.Transactional;
+
+import org.springframework.stereotype.Service;
 
 import com.zerobase.minesweeper.dto.GamerDto;
 import com.zerobase.minesweeper.entity.Game;
@@ -10,12 +16,8 @@ import com.zerobase.minesweeper.repository.GameRepository;
 import com.zerobase.minesweeper.repository.GamerRepository;
 import com.zerobase.minesweeper.type.ErrorCode;
 import com.zerobase.minesweeper.type.Role;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
-import java.util.List;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor

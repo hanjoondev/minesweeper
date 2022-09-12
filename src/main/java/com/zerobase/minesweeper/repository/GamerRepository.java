@@ -1,11 +1,12 @@
 package com.zerobase.minesweeper.repository;
 
-import com.zerobase.minesweeper.entity.Gamer;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
+import com.zerobase.minesweeper.entity.Gamer;
 
 @Repository
 public interface GamerRepository extends JpaRepository<Gamer, Long> {

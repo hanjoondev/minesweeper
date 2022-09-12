@@ -7,11 +7,6 @@ import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
-import com.zerobase.minesweeper.exception.GameException;
-import com.zerobase.minesweeper.type.ErrorCode;
-
-import com.zerobase.minesweeper.type.Role;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,9 +24,12 @@ import com.zerobase.minesweeper.dto.Rank;
 import com.zerobase.minesweeper.entity.Game;
 import com.zerobase.minesweeper.entity.Gamer;
 import com.zerobase.minesweeper.entity.Ranking;
+import com.zerobase.minesweeper.exception.GameException;
 import com.zerobase.minesweeper.repository.GameRepository;
 import com.zerobase.minesweeper.repository.GamerRepository;
 import com.zerobase.minesweeper.repository.RankingRepository;
+import com.zerobase.minesweeper.type.ErrorCode;
+import com.zerobase.minesweeper.type.Role;
 
 import lombok.RequiredArgsConstructor;
 
@@ -218,12 +216,9 @@ public class GameService {
 
     @Transactional
     public boolean deleteGame(String gameId) {
-
         Long id = Long.valueOf(gameId);
         Game game = gameRepository.findById(id).orElseThrow(() -> new GameException(ErrorCode.GAME_NOT_FOUND));
-
         gameRepository.delete(game);
-
         return true;
     }
 }

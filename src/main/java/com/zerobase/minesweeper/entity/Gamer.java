@@ -1,12 +1,24 @@
 package com.zerobase.minesweeper.entity;
 
-import com.zerobase.minesweeper.type.Role;
-import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import javax.persistence.*;
 import java.time.LocalDateTime;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+import org.hibernate.annotations.CreationTimestamp;
+
+import com.zerobase.minesweeper.type.Role;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -27,7 +39,6 @@ public class Gamer {
     @Enumerated(EnumType.STRING)
     private Role role;
     private boolean isSuspend;
-
     @CreationTimestamp
     private LocalDateTime regDt;
     private LocalDateTime verifiedDt;

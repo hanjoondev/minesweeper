@@ -1,21 +1,28 @@
 package com.zerobase.minesweeper.service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.web.socket.WebSocketHandler;
+import org.springframework.web.socket.messaging.SubProtocolWebSocketHandler;
+import org.springframework.web.socket.messaging.SubProtocolWebSocketHandler.*;
+
 import com.zerobase.minesweeper.dto.ChatMessage;
 import com.zerobase.minesweeper.dto.LobbyChatDto;
 import com.zerobase.minesweeper.dto.LobbyChatResponse;
 import com.zerobase.minesweeper.dto.LobbyChatStartResponse;
 import com.zerobase.minesweeper.entity.LobbyChat;
 import com.zerobase.minesweeper.repository.LobbyChatRepository;
-import org.springframework.stereotype.Service;
-import org.springframework.web.socket.WebSocketHandler;
-import org.springframework.web.socket.messaging.SubProtocolWebSocketHandler;
-import org.springframework.web.socket.messaging.SubProtocolWebSocketHandler.*;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
 @Service
 public class LobbyChatService {
@@ -29,9 +36,9 @@ public class LobbyChatService {
     }
 
     private static final Queue<LobbyChatDto> chatCacheQueue = new ConcurrentLinkedQueue<>();
-    private static long lastIndex;
     private static final int CHAT_CACHE_SIZE = 30;
     private static final DateTimeFormatter customTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static long lastIndex;
 
     public LobbyChatStartResponse getStartChats() {
         return new LobbyChatStartResponse(new ArrayList<>(chatCacheQueue), lastIndex, websocketSessionStats.getWebSocketSessions());

@@ -1,7 +1,5 @@
 package com.zerobase.minesweeper.security;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -14,7 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-@Slf4j
+import lombok.RequiredArgsConstructor;
+
 @RequiredArgsConstructor
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -50,35 +49,29 @@ public class SecurityConfig {
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                /*  rest 관련 설정
-                * */
 
                 .headers()
                 .frameOptions()
                 .sameOrigin()
                 .and()
-                /*  h2-console 설정
-                * */
 
                 .exceptionHandling()
                 .authenticationEntryPoint(authenticationEntryPoint)
                 .accessDeniedHandler(accessDeniedHandler)
                 .and()
-                /*  custom handler 등록
-                * */
 
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
-                    .antMatchers("/", "/auth/**", "/chat-lobby/**",
-                            "/stomp/**")
-                    .permitAll()
-                /*  로그인 인증 필요없는 url 설정
-                * */
+                .antMatchers(
+                    "/",
+                    "/auth/**",
+                    "/chat-lobby/**",
+                    "/stomp/**"
+                )
+                .permitAll()
 
                 .anyRequest()
                 .authenticated();
-                /*  이외 모두 인증필요
-                * */
 
         return http.build();
     }
