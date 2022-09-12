@@ -3,10 +3,13 @@ package com.zerobase.minesweeper.service;
 import com.zerobase.minesweeper.dto.ChatMessage;
 import com.zerobase.minesweeper.dto.LobbyChatDto;
 import com.zerobase.minesweeper.dto.LobbyChatResponse;
+import com.zerobase.minesweeper.dto.LobbyChatStartResponse;
 import com.zerobase.minesweeper.entity.LobbyChat;
 import com.zerobase.minesweeper.repository.LobbyChatRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.socket.WebSocketHandler;
+import org.springframework.web.socket.messaging.SubProtocolWebSocketHandler;
+import org.springframework.web.socket.messaging.SubProtocolWebSocketHandler.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -14,18 +17,24 @@ import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
 @Service
 public class LobbyChatService {
     private final LobbyChatRepository lobbyChatRepository;
+    private final Stats websocketSessionStats;
+
+    public LobbyChatService(LobbyChatRepository lobbyChatRepository, WebSocketHandler webSocketHandler) {
+        this.lobbyChatRepository = lobbyChatRepository;
+        SubProtocolWebSocketHandler subProtocolWebSocketHandler = (SubProtocolWebSocketHandler) webSocketHandler;
+        this.websocketSessionStats = subProtocolWebSocketHandler.getStats();
+    }
 
     private static final Queue<LobbyChatDto> chatCacheQueue = new ConcurrentLinkedQueue<>();
     private static long lastIndex;
     private static final int CHAT_CACHE_SIZE = 30;
     private static final DateTimeFormatter customTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    public LobbyChatResponse getRecentlyChats() {
-        return new LobbyChatResponse(new ArrayList<>(chatCacheQueue), lastIndex);
+    public LobbyChatStartResponse getStartChats() {
+        return new LobbyChatStartResponse(new ArrayList<>(chatCacheQueue), lastIndex, websocketSessionStats.getWebSocketSessions());
     }
 
     public LobbyChatDto saveChat(ChatMessage chatMessage) {
