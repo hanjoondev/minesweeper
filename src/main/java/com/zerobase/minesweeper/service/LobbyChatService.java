@@ -41,7 +41,7 @@ public class LobbyChatService {
     private static long lastIndex;
 
     public LobbyChatStartResponse getStartChats() {
-        return new LobbyChatStartResponse(new ArrayList<>(chatCacheQueue), lastIndex, websocketSessionStats.getWebSocketSessions());
+        return new LobbyChatStartResponse(new ArrayList<>(chatCacheQueue), lastIndex, websocketSessionStats.getWebSocketSessions() + 1);
     }
 
     public LobbyChatDto saveChat(ChatMessage chatMessage) {
