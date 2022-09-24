@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.zerobase.minesweeper.dto.ChatMessage;
 import com.zerobase.minesweeper.dto.LobbyChatDto;
 import com.zerobase.minesweeper.dto.LobbyChatResponse;
+import com.zerobase.minesweeper.dto.LobbyChatStartResponse;
 import com.zerobase.minesweeper.service.LobbyChatService;
 
 import lombok.RequiredArgsConstructor;
@@ -21,16 +22,16 @@ import javax.validation.Valid;
 public class ChattingController {
     private final LobbyChatService lobbyChatService;
 
-    @MessageMapping("/lobby")
-    @SendTo("/topic/lobby")
+    @MessageMapping({"/lobby"})
+    @SendTo({"/topic/lobby"})
     public LobbyChatDto lobbyChat(@Valid ChatMessage chatMessage) {
         return lobbyChatService.saveChat(chatMessage);
     }
 
     // 채팅 첫 입장
     @GetMapping("/chat-lobby")
-    public ResponseEntity<LobbyChatResponse> getRecentlyChat() {
-        return ResponseEntity.ok(lobbyChatService.getRecentlyChats());
+    public ResponseEntity<LobbyChatStartResponse> getRecentlyChat() {
+        return ResponseEntity.ok(lobbyChatService.getStartChats());
     }
 
     // lastIndex 부터
