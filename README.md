@@ -2,9 +2,13 @@
 ![free-icon-bomb](https://user-images.githubusercontent.com/49369306/195980589-ac70d4f2-4dba-4537-879c-325969df90e1.png)
 
 ## :video_game: 주요 기능
-* 웹에서 지뢰찾기를 즐기고 다른 사람과 기록을 경쟁할 수 있습니다
-* 게임 기록을 저장하고 리플레이를 볼 수 있습니다
-* 다른 사람들과 실시간으로 소통할 수 있습니다
+* jwt 토큰을 이용한 회원가입 및 이메일 인증기능.
+* 웹에서 지뢰찾기를 즐기고 다른 사람과 기록을 경쟁할 수 있습니다 - (익명으로도 가능합니다.)
+* 게임 기록을 저장하고 리플레이를 볼 수 있습니다.
+* 다른 사람들과 실시간으로 소통할 수 있습니다.
+* 마이페이지 통산 전적 통계 및 랭킹보기 기능
+* 어드민 회원 관리기능 정지 및 회원 탈퇴
+* Front Page UI 최적화 및 반응형 
 
 ## :link: 바로 가기
 * [지뢰찾기 플레이 하러 가기](https://minesweeper-2283e.firebaseapp.com/)
@@ -64,12 +68,11 @@
 </tbody>
 </table>
 
-## :busts_in_silhouette: 팀원 소개
+## :busts_in_silhouette: 팀원
 | Role | Name | Profile |
 | :--: | :--: | :-----: |
 |  **FE**  | 천우석 | [wooseokc](https://github.com/wooseokc)     |
-|    FE    | 이기문 | [kimoon1](https://github.com/kimoon1)       |![free-icon-bomb](https://user-images.githubusercontent.com/49369306/195980554-47778f7b-d012-49c1-b299-a1cb44a377cb.png)
-
+|    FE    | 이기문 | [kimoon1](https://github.com/kimoon1)       |
 |  **BE**  | 김한준 | [hanjoondev](https://github.com/hanjoondev) |
 |    BE    | 소재열 | [devjy39](https://github.com/devjy39)       |
 |    BE    | 정민식 | [Mike-Jeong](https://github.com/Mike-Jeong) |
